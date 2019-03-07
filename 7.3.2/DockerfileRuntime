@@ -1,0 +1,33 @@
+# Here's the go. We are going to generate a PHP base package first which contains a full PHP install.
+# This is then used by DockerfileRuntime to generate the real runtime PHP container.
+# We do this to avoid having to rebuild PHP completely if we have only minor changes to be made to the PHP container.
+# Saves time!
+
+
+# 1. First reference the php-base image.
+FROM gearboxworks/php-base:7.2.15
+
+
+# 2. Now copy the local files specific to this image.
+COPY build /build
+COPY container.json /build/container.json
+
+
+# 3. Set up env variables.
+MAINTAINER Gearbox Team <team@gearbox.works>
+
+
+# 4. Run the cleanup-php.sh script to set everything up.
+RUN /bin/sh -x build/cleanup-php.sh
+
+
+# 5. Expose ports.
+EXPOSE 9000 9970
+
+
+# 6. Set default command to exec.
+# USER gearbox
+WORKDIR /project/www
+# ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
+CMD ["/usr/sbin/php-fpm", "-F"]
+

@@ -1,0 +1,43 @@
+# Here's the go. We are going to generate a PHP base package first which contains a full PHP install.
+# This is then used by DockerfileRuntime to generate the real runtime PHP container.
+# We do this to avoid having to rebuild PHP completely if we have only minor changes to be made to the PHP container.
+# Saves time!
+
+
+# 1. First reference the gearbox-base image.
+FROM gearboxworks/gearbox-base:3.8
+
+
+# 2. Now copy the local files specific to this image.
+COPY build /build
+COPY container.json /build/container.json
+
+
+# 3. Set up env variables.
+MAINTAINER Gearbox Team <team@gearbox.works>
+ARG GEARBOX_CONTAINER_NAME="docker-php"
+ARG GEARBOX_CONTAINER_VERSION="7.2.15"
+# ARG GEARBOX_CONTAINER_URL="https://github.com/php/php-src/archive/php-7.2.15.tar.gz"
+ARG GEARBOX_CONTAINER_URL="http://php.net/get/php-7.2.15.tar.gz/from/this/mirror"
+ARG GEARBOX_CONTAINER_MD5=""
+ARG GEARBOX_CONTAINER_ROOT="/"
+
+ENV GEARBOX_CONTAINER_NAME $GEARBOX_CONTAINER_NAME
+ENV GEARBOX_CONTAINER_VERSION $GEARBOX_CONTAINER_VERSION
+ENV GEARBOX_CONTAINER_URL $GEARBOX_CONTAINER_URL
+ENV GEARBOX_CONTAINER_MD5 $GEARBOX_CONTAINER_MD5
+ENV GEARBOX_CONTAINER_ROOT $GEARBOX_CONTAINER_ROOT
+
+
+# 4. Run the build-php.sh script to set everything up.
+RUN /bin/sh -x /build/build-php.sh
+
+
+# 5. Expose ports.
+EXPOSE 9000 9970
+
+
+# 6. Set default command to exec.
+WORKDIR /build
+CMD     [ "/bin/bash", "-l" ]
+
