@@ -1,16 +1,56 @@
-FROM gearbox/php-base:5.5.38
+# This file is essentially a merge of DockerfileBase & DockerfileTarball
 
+# 1. First reference the php-base image.
+FROM gearboxworks/php-base:5.5.38 as php-base
+
+
+# 2. Now copy the local files specific to this image.
+COPY build /build
+COPY container.json /build/container.json
+
+
+# 3. Set up env variables.
+MAINTAINER Gearbox Team <team@gearbox.works>
+ENV GEARBOX_CONTAINER_NAME "docker-php"
+ENV GEARBOX_CONTAINER_VERSION "5.5.38"
+ENV GEARBOX_CONTAINER_URL "http://php.net/get/php-5.5.38.tar.gz/from/this/mirror"
+# ENV GEARBOX_CONTAINER_URL "https://github.com/php/php-src/archive/php-5.5.38.tar.gz"
+ENV GEARBOX_CONTAINER_MD5 ""
+ENV GEARBOX_CONTAINER_ROOT "/"
+
+
+# 4. Run the build-php.sh script to set everything up.
+RUN /bin/sh /build/build-php.sh
+
+
+# 5. Load Gearbox default container.
+FROM gearboxworks/gearbox-base:3.7
+
+
+# 6. Copy the tarball generated from the previous layer to this new layer.
+COPY --from=php-base /build/output/php.tar.gz /build/output/php.tar.gz
+
+
+# 7. Set up env variables.
 MAINTAINER Gearbox Team <team@gearbox.works>
 
-################################################################################
-ENV BASE_BUILD $BASE_BUILD
 
-COPY container.json /etc/container.json
-COPY files /
+# 8. Copy the build directory to the layer.
+COPY build /build
+COPY container.json /build/container.json
 
-RUN	chmod a+x /usr/local/bin/* && /build/cleanup.sh
 
-WORKDIR /project/www
+# 9. Install tarball and other depends.
+RUN /bin/sh /build/tarball-php.sh
+
+
+# 10. Expose ports.
+EXPOSE 9000 9970
+
+
+# 11. Set default command to exec.
 # USER gearbox
+WORKDIR /project/www
 # ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
-CMD ["/usr/sbin/php-fpm", "-x"]
+CMD ["/usr/sbin/php-fpm", "-F"]
+

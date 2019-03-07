@@ -46,14 +46,22 @@ ARGS		:= $(call GetFromPkg,args)
 ENV		:= $(call GetFromPkg,env)
 
 OLDNAME		:= $(NAME)
-ifeq ($(BUILD_TYPE),)
-DOCKERFILE	:= DockerfileRuntime
-BUILD_ARGS	:= --squash
-NAME		:= $(NAME)
-else
+ifeq ($(BUILD_TYPE),base)
 DOCKERFILE	:= DockerfileBase
 BUILD_ARGS	:= --build-arg BUILD_TYPE="$(BUILD_TYPE)"
 NAME		:= $(NAME)-$(BUILD_TYPE)
+endif
+
+ifeq ($(BUILD_TYPE),full)
+DOCKERFILE	:= DockerfileRuntime
+BUILD_ARGS	:= --squash
+NAME		:= $(NAME)
+endif
+
+ifeq ($(BUILD_TYPE),)
+DOCKERFILE	:= DockerfileTarball
+BUILD_ARGS	:= 
+NAME		:= $(NAME)
 endif
 
 IMAGE_NAME	?= $(ORGANIZATION)/$(NAME)
@@ -98,10 +106,24 @@ clean-base: $(DOCKERFILE)
 	@make clean BUILD_TYPE="base"
 
 build-base: $(DOCKERFILE)
-	@make build-full BUILD_TYPE="base"
+	@make build BUILD_TYPE="base"
 
 push-base: $(DOCKERFILE)
 	@make push BUILD_TYPE="base"
+
+
+################################################################################
+info-full: $(DOCKERFILE)
+	@make info BUILD_TYPE="full"
+
+clean-full: $(DOCKERFILE)
+	@make clean BUILD_TYPE="full"
+
+build-full: $(DOCKERFILE)
+	@make build BUILD_TYPE="full"
+
+push-full: $(DOCKERFILE)
+	@make push BUILD_TYPE="full"
 
 
 ################################################################################
@@ -119,28 +141,13 @@ build: DockerfileTarball
 ifeq ($(ORGANIZATION),)
 	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
 else
-	docker run --rm -it -v `pwd`:/tmp $(ORGANIZATION)/$(NAME)-base:$(VERSION) tar cf /tmp/tarball --exclude=/build --exclude=/etc/hostname --exclude=/etc/hosts --exclude=/etc/resolv.conf /bin /etc /home /lib /media /mnt /root /sbin /usr /var
-	docker build -t $(IMAGE_NAME):$(VERSION) --label container.json='$(call rawJSON)' --label container.organization="$(ORGANIZATION)" --label container.name="$(NAME)" --label container.version="$(VERSION)" --label container.majorversion="$(MAJORVERSION)" --label container.latest="$(LATEST)" --label container.class="$(CLASS)" --label container.network="$(NETWORK)" --label container.ports="$(PORTS)" --label container.volumes="$(VOLUMES)" --label container.restart="$(RESTART)" --label container.args="$(ARGS)" --label container.env="$(ENV)" --build-arg $(ENV)="$(VERSION)" $(BUILD_ARGS) -f DockerfileTarball .
-ifneq ($(MAJORVERSION),)
-	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(MAJORVERSION)
-endif
-	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -m > $(NAME)-modules.txt
-	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -i > $(NAME)-info.txt
-endif
-
-
-################################################################################
-build-full: $(DOCKERFILE)
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-else
 	script -r -t 10 logs/$(LOGFILE) docker build -t $(IMAGE_NAME):$(VERSION) --label container.json='$(call rawJSON)' --label container.organization="$(ORGANIZATION)" --label container.name="$(NAME)" --label container.version="$(VERSION)" --label container.majorversion="$(MAJORVERSION)" --label container.latest="$(LATEST)" --label container.class="$(CLASS)" --label container.network="$(NETWORK)" --label container.ports="$(PORTS)" --label container.volumes="$(VOLUMES)" --label container.restart="$(RESTART)" --label container.args="$(ARGS)" --label container.env="$(ENV)" --build-arg $(ENV)="$(VERSION)" $(BUILD_ARGS) -f $(DOCKERFILE) .
+	@echo "Gearbox: Log file saved to \"logs/$(LOGFILE)\""
 ifneq ($(MAJORVERSION),)
 	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(MAJORVERSION)
 endif
 	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -m > $(NAME)-modules.txt
 	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -i > $(NAME)-info.txt
-	@echo "Gearbox: Log file saved to \"logs/$(LOGFILE)\""
 endif
 
 
@@ -178,7 +185,7 @@ else
 ifneq ($(MAJORVERSION),)
 	-docker image rm -f $(IMAGE_NAME):$(MAJORVERSION)
 endif
-	-rm php-base-info.txt php-base-modules.txt php-info.txt php-modules.txt tarball
+	-rm -f php-base-info.txt php-base-modules.txt php-info.txt php-modules.txt build/output/$(NAME)-$(VERSION).tar logs/*.log
 endif
 
 
@@ -229,7 +236,7 @@ shell:
 ifeq ($(ORGANIZATION),)
 	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
 else
-	docker run --rm --name $(CONTAINER_NAME)-shell -i -t $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION) /bin/bash
+	docker run --rm --name $(CONTAINER_NAME)-shell -i -t $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION) /bin/bash -l
 endif
 
 

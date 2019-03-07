@@ -5,7 +5,7 @@
 
 
 # 1. First reference the gearbox-base image.
-FROM gearboxworks/gearbox-base:3.7
+FROM gearboxworks/gearbox-base:3.8
 
 
 # 2. Now copy the local files specific to this image.
@@ -24,7 +24,7 @@ ENV GEARBOX_CONTAINER_ROOT "/"
 
 
 # 4. Run the build-php.sh script to set everything up.
-RUN /bin/sh -x /build/build-php.sh
+RUN /bin/sh /build/build-php.sh
 
 
 # 5. Expose ports.

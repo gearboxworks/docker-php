@@ -1,12 +1,12 @@
 pkgname=php
-pkgver=${PACKAGE_VERSION}
-#pkgdir=${PACKAGE_ROOT}
+pkgver=${GEARBOX_CONTAINER_VERSION}
+#pkgdir=${GEARBOX_CONTAINER_ROOT}
 pkgrel=1
 arch=('i686' 'x86_64')
 license=('PHP')
 url='http://www.php.net'
 source=("http://www.php.net/distributions/php-${pkgver}.tar.gz")
-md5sums=("${PACKAGE_MD5}")
+md5sums=("${GEARBOX_CONTAINER_MD5}")
 
 CFLAGS="-fstack-protector-strong -fpic -fpie -O2"
 export CFLAGS
@@ -18,7 +18,7 @@ export LDFLAGS
 
 check()
 {
-	echo "# Gearbox: PHP ${PACKAGE_VERSION} - test function."
+	echo "# Gearbox: PHP ${GEARBOX_CONTAINER_VERSION} - test function."
 
 	cd ${pkgname}-${pkgver}
 
@@ -27,7 +27,7 @@ check()
 
 build()
 {
-	echo "# Gearbox: PHP ${PACKAGE_VERSION} - build function."
+	echo "# Gearbox: PHP ${GEARBOX_CONTAINER_VERSION} - build function."
 
 	cd ${pkgname}-${pkgver}
 
@@ -118,7 +118,7 @@ build()
 
 package()
 {
-	echo "# Gearbox: PHP ${PACKAGE_VERSION} - package function."
+	echo "# Gearbox: PHP ${GEARBOX_CONTAINER_VERSION} - package function."
 
 	pkgdesc='An HTML-embedded scripting language'
 	# depends=('pcre' 'bzip2')

@@ -24664,7 +24664,7 @@ diff -Nru php-5.2.4.vanilla/libevent/aclocal.m4 php-5.2.4/libevent/aclocal.m4
 + AC_SUBST([VERSION], [$2])],
 +[_AM_SET_OPTIONS([$1])dnl
 + AC_SUBST([PACKAGE], ['AC_PACKAGE_TARNAME'])dnl
-+ AC_SUBST([VERSION], ['AC_PACKAGE_VERSION'])])dnl
++ AC_SUBST([VERSION], ['AC_GEARBOX_CONTAINER_VERSION'])])dnl
 +
 +_AM_IF_OPTION([no-define],,
 +[AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Name of package])
@@ -28690,7 +28690,7 @@ diff -Nru php-5.2.4.vanilla/libevent/config.h.in php-5.2.4/libevent/config.h.in
 +#undef PACKAGE_TARNAME
 +
 +/* Define to the version of this package. */
-+#undef PACKAGE_VERSION
++#undef GEARBOX_CONTAINER_VERSION
 +
 +/* Define to 1 if you have the ANSI C header files. */
 +#undef STDC_HEADERS
@@ -30715,7 +30715,7 @@ diff -Nru php-5.2.4.vanilla/libevent/configure php-5.2.4/libevent/configure
 +# Identity of this package.
 +PACKAGE_NAME=
 +PACKAGE_TARNAME=
-+PACKAGE_VERSION=
++GEARBOX_CONTAINER_VERSION=
 +PACKAGE_STRING=
 +PACKAGE_BUGREPORT=
 +
@@ -30757,7 +30757,7 @@ diff -Nru php-5.2.4.vanilla/libevent/configure php-5.2.4/libevent/configure
 +# include <unistd.h>
 +#endif"
 +
-+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LN_S CPP EGREP build build_cpu build_vendor build_os host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOL_DEPS BUILD_WIN32_TRUE BUILD_WIN32_FALSE LIBOBJS LTLIBOBJS'
++ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME GEARBOX_CONTAINER_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LN_S CPP EGREP build build_cpu build_vendor build_os host host_cpu host_vendor host_os ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL LIBTOOL_DEPS BUILD_WIN32_TRUE BUILD_WIN32_FALSE LIBOBJS LTLIBOBJS'
 +ac_subst_files=''
 +
 +# Initialize some variables set by options.
@@ -31667,7 +31667,7 @@ diff -Nru php-5.2.4.vanilla/libevent/configure php-5.2.4/libevent/configure
 +
 +
 +cat >>confdefs.h <<_ACEOF
-+#define PACKAGE_VERSION "$PACKAGE_VERSION"
++#define GEARBOX_CONTAINER_VERSION "$GEARBOX_CONTAINER_VERSION"
 +_ACEOF
 +
 +
@@ -52858,7 +52858,7 @@ diff -Nru php-5.2.4.vanilla/libevent/configure php-5.2.4/libevent/configure
 +s,@PATH_SEPARATOR@,$PATH_SEPARATOR,;t t
 +s,@PACKAGE_NAME@,$PACKAGE_NAME,;t t
 +s,@PACKAGE_TARNAME@,$PACKAGE_TARNAME,;t t
-+s,@PACKAGE_VERSION@,$PACKAGE_VERSION,;t t
++s,@GEARBOX_CONTAINER_VERSION@,$GEARBOX_CONTAINER_VERSION,;t t
 +s,@PACKAGE_STRING@,$PACKAGE_STRING,;t t
 +s,@PACKAGE_BUGREPORT@,$PACKAGE_BUGREPORT,;t t
 +s,@exec_prefix@,$exec_prefix,;t t
@@ -75086,7 +75086,7 @@ diff -Nru php-5.2.4.vanilla/libevent/Makefile.in php-5.2.4/libevent/Makefile.in
 +PACKAGE_NAME = @PACKAGE_NAME@
 +PACKAGE_STRING = @PACKAGE_STRING@
 +PACKAGE_TARNAME = @PACKAGE_TARNAME@
-+PACKAGE_VERSION = @PACKAGE_VERSION@
++GEARBOX_CONTAINER_VERSION = @GEARBOX_CONTAINER_VERSION@
 +PATH_SEPARATOR = @PATH_SEPARATOR@
 +RANLIB = @RANLIB@
 +SET_MAKE = @SET_MAKE@

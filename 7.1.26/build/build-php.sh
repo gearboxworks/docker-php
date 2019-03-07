@@ -170,7 +170,7 @@ make; checkExit
 echo "# Gearbox: Install PHP ${GEARBOX_CONTAINER_VERSION}."
 make install; checkExit
 install -d -m755 ${PHPINSTALL}/etc/php/conf.d/; checkExit
-rmdir ${PHPINSTALL}/include/php; checkExit
+# rmdir ${PHPINSTALL}/include/php; checkExit
 mkdir -p /var/run/php; checkExit
 
 
@@ -235,3 +235,19 @@ echo "# Gearbox: pecl update-channels."
 #     "Warning: Invalid argument supplied for foreach() in Command.php on line 249"
 sed -i 's/^exec $PHP -C -n -q/exec $PHP -C -q/' ${PHPINSTALL}/bin/pecl; checkExit
 pecl update-channels; checkExit
+
+
+echo "# Gearbox: Download mhsendmail."
+if [ ! -d /usr/local/bin ]
+then
+	mkdir -p /usr/local/bin
+fi
+wget -nv -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64; checkExit
+chmod a+x /usr/local/bin/mhsendmail; checkExit
+
+
+if [ ! -d "${BUILDDIR}/output" ]
+then
+	mkdir -p "${BUILDDIR}/output"
+fi
+tar zcvf "${BUILDDIR}/output/php.tar.gz" /usr/local

@@ -185,7 +185,7 @@ else
 ifneq ($(MAJORVERSION),)
 	-docker image rm -f $(IMAGE_NAME):$(MAJORVERSION)
 endif
-	-rm -f php-base-info.txt php-base-modules.txt php-info.txt php-modules.txt build/output/$(NAME)-$(VERSION).tar
+	-rm -f php-base-info.txt php-base-modules.txt php-info.txt php-modules.txt build/output/$(NAME)-$(VERSION).tar logs/*.log
 endif
 
 
