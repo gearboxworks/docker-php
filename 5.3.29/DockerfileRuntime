@@ -1,7 +1,9 @@
+ARG VERSION="5.3.29"
+
 # This file is essentially a merge of DockerfileBase & DockerfileTarball
 
 # 1. First reference the php-base image.
-FROM gearboxworks/php-base:5.3.29 as php-base
+FROM gearboxworks/php-base:$VERSION as php-base
 
 
 # 2. Now copy the local files specific to this image.
@@ -12,9 +14,9 @@ COPY container.json /build/container.json
 # 3. Set up env variables.
 MAINTAINER Gearbox Team <team@gearbox.works>
 ENV GEARBOX_CONTAINER_NAME "docker-php"
-ENV GEARBOX_CONTAINER_VERSION "5.3.29"
-ENV GEARBOX_CONTAINER_URL "http://php.net/get/php-5.3.29.tar.gz/from/this/mirror"
-# ENV GEARBOX_CONTAINER_URL "https://github.com/php/php-src/archive/php-5.3.29.tar.gz"
+ENV GEARBOX_CONTAINER_VERSION $VERSION
+ENV GEARBOX_CONTAINER_URL "http://php.net/get/php-$VERSION.tar.gz/from/this/mirror"
+# ENV GEARBOX_CONTAINER_URL "https://github.com/php/php-src/archive/php-$VERSION.tar.gz"
 ENV GEARBOX_CONTAINER_MD5 ""
 ENV GEARBOX_CONTAINER_ROOT "/"
 
@@ -24,7 +26,7 @@ RUN /bin/sh /build/build-php.sh
 
 
 # 5. Load Gearbox default container.
-FROM gearboxworks/gearbox-base:3.7
+FROM gearboxworks/gearbox-base:alpine-3.7
 
 
 # 6. Copy the tarball generated from the previous layer to this new layer.
