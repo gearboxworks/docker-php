@@ -1,29 +1,18 @@
 #!/bin/sh
 
+# See gearboxworks/gearbox-base for details.
+test -f /build/include-me.sh && . /build/include-me.sh
+
+c_ok "Started."
+
 # ssh-keygen -A
 BUILDDIR="/build"
 
 
-checkExit()
-{
-	if [ "$?" != "0" ]
-	then
-		echo "# Gearbox: Exit reason \"$@\""
-		exit $?
-	fi
-}
-
-
 if [ ! -d ${BUILDDIR} ]
 then
-	echo "# Gearbox: ${BUILDDIR} doesn't exist."
-	exit
-fi
-
-
-if [ -d "/build/rootfs/" ]
-then
-	rsync -HvaxP /build/rootfs/ /
+	c_err "${BUILDDIR} doesn't exist."
+	exit 1
 fi
 
 
@@ -44,19 +33,19 @@ LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"; export LDFLAGS
 EXTENSION_DIR=${PHPINSTALL}/lib/php/modules; export EXTENSION_DIR
 
 
-echo "# Gearbox: Adding packages."
+c_ok "Adding packages."
 apk update; checkExit
 apk add --no-cache --virtual gearbox.persist $PERSIST_DEPS; checkExit
 apk add --no-cache --virtual gearbox.build $BUILD_DEPS; checkExit
 
 
-echo "# Gearbox: Fetching tarballs."
+c_ok "Fetching tarballs."
 cd /build; checkExit
 wget -nv -O "php-${GEARBOX_CONTAINER_VERSION}.tar.gz" -nv "$GEARBOX_CONTAINER_URL"; checkExit
 tar zxf php-${GEARBOX_CONTAINER_VERSION}.tar.gz; checkExit
 
 
-echo "# Gearbox: Patching PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Patching PHP ${GEARBOX_CONTAINER_VERSION}."
 cd ${BUILDDIR}; checkExit
 # patch -p0 < install-pear.patch; checkExit
 # patch -p0 < libressl-2.7.patch; checkExit
@@ -64,7 +53,7 @@ patch -p0 < allow-build-recode-and-imap-together.patch; checkExit
 ln /usr/include/tidybuffio.h /usr/include/buffio.h
 
 
-echo "# Gearbox: Configure PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Configure PHP ${GEARBOX_CONTAINER_VERSION}."
 cd ${PHPBUILD}; checkExit
 autoconf; checkExit
 ./configure --config-cache --cache-file=config.cache \
@@ -186,17 +175,17 @@ autoconf; checkExit
 #	--enable-mbstring=all
 #	--enable-libxml=shared
 
-echo "# Gearbox: Compile PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Compile PHP ${GEARBOX_CONTAINER_VERSION}."
 make; checkExit
 
-echo "# Gearbox: Install PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Install PHP ${GEARBOX_CONTAINER_VERSION}."
 make install; checkExit
 install -d -m755 ${PHPINSTALL}/etc/php/conf.d/; checkExit
 # rmdir ${PHPINSTALL}/include/php; checkExit
 mkdir -p /var/run/php; checkExit
 
 
-echo "# Gearbox: Adding Imagick extension, (3.4.3)."
+c_ok "Adding Imagick extension, (3.4.3)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/imagick-3.4.3.tgz; checkExit
 tar zxf imagick-3.4.3.tgz; checkExit
@@ -207,7 +196,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding Xdebug extension, (2.5.5)."
+c_ok "Adding Xdebug extension, (2.5.5)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv https://xdebug.org/files/xdebug-2.5.5.tgz; checkExit
 tar zxf xdebug-2.5.5.tgz; checkExit
@@ -218,7 +207,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding ssh2 extension, (0.13)."
+c_ok "Adding ssh2 extension, (0.13)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/ssh2-0.13.tgz; checkExit
 tar zxf ssh2-0.13.tgz; checkExit
@@ -231,7 +220,7 @@ make install; checkExit
 
 # Produces this error:
 # Failed loading /usr/lib/php/modules/opcache.so:  Error relocating /usr/lib/php/modules/opcache.so: expand_filepath_ex: symbol not found
-#echo "# Gearbox: Adding libsodium extension, (2.0.11)."
+#c_ok "Adding libsodium extension, (2.0.11)."
 #cd ${PHPBUILD}/ext; checkExit
 #wget -nv http://pecl.php.net/get/libsodium-2.0.11.tgz; checkExit
 #tar zxf libsodium-2.0.11.tgz; checkExit
@@ -242,7 +231,7 @@ make install; checkExit
 #make install; checkExit
 
 
-echo "# Gearbox: pecl update-channels."
+c_ok "pecl update-channels."
 # Fixup pecl errors.
 # EG: "Warning: Invalid argument supplied for foreach() in ${PHPINSTALL}/share/pear/PEAR/Command.php
 #     "Warning: Invalid argument supplied for foreach() in Command.php on line 249"
@@ -250,18 +239,12 @@ sed -i 's/^exec $PHP -C -n -q/exec $PHP -C -q/' ${PHPINSTALL}/bin/pecl; checkExi
 pecl update-channels; checkExit
 
 
-echo "# Gearbox: Download mhsendmail."
-if [ ! -d /usr/local/bin ]
-then
-	mkdir -p /usr/local/bin
-fi
-wget -nv -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64; checkExit
-chmod a+x /usr/local/bin/mhsendmail; checkExit
-
-
+c_ok "Creating PHP tarball."
 if [ ! -d "${BUILDDIR}/output" ]
 then
-	mkdir -p "${BUILDDIR}/output"
+	mkdir -p "${BUILDDIR}/output"; checkExit
 fi
-tar zcvf "${BUILDDIR}/output/php.tar.gz" /usr/local
+tar zcvf "${BUILDDIR}/output/php.tar.gz" /usr/local; checkExit
 
+
+c_ok "Finished."

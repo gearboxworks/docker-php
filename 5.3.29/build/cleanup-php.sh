@@ -1,32 +1,39 @@
 #!/bin/sh
 
+# See gearboxworks/gearbox-base for details.
+test -f /build/build-base.sh && /bin/sh /build/build-base.sh
+test -f /build/include-me.sh && . /build/include-me.sh
 
-checkExit()
-{
-	if [ "$?" != "0" ]
-	then
-		echo "# Gearbox: Exit reason \"$@\""
-		exit $?
-	fi
-}
+c_ok "Started."
+
+BUILDDIR="/build"
+
 
 if [ "$BUILD_TYPE" != "" ]
 then
-	echo "# Gearbox: Maintaining build packages for build type \"$BUILD_TYPE\"."
-	exit
+	c_ok "Maintaining build packages for build type \"$BUILD_TYPE\"."
+	exit 0
 fi
 
-# find . -type f -perm +0111 -exec strip --strip-all '{}'
 
-echo "# Gearbox: Removing build packages for runtime."
+c_ok "Setting permissions."
+find /usr/local/bin /usr/local/sbin -type f | xargs chmod a+x
+
+
+c_ok "Removing build packages for runtime."
 apk del gearbox.build; checkExit
 
-echo "# Gearbox: Adding packages required by PHP ${GEARBOX_CONTAINER_VERSION}."
+
+c_ok "Adding packages required by PHP ${GEARBOX_CONTAINER_VERSION}."
 RUNTIME_DEPS="$(scanelf --needed --nobanner --format '%n#p' --recursive /usr | tr ',' '\n' | sort -u | awk '/libmysqlclient.so.16/{next} system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }')"
-echo "# ${RUNTIME_DEPS}"
+c_ok "Installing $(echo "${RUNTIME_DEPS}" | grep -c 'so:') packages."
 apk add --no-cache --virtual gearbox.runtime ${RUNTIME_DEPS}; checkExit
 
-echo "# Gearbox: Cleaning up."
-rm -rf ${BUILDDIR}
-unset BUILD_DEPS PERSIST_DEPS RUNTIME_DEPS CPPFLAGS LDFLAGS CFLAGS EXTENSION_DIR
 
+c_ok "Cleaning up."
+rm -rf ${BUILDDIR}; checkExit
+unset BUILD_DEPS PERSIST_DEPS RUNTIME_DEPS CPPFLAGS LDFLAGS CFLAGS EXTENSION_DIR
+# find . -type f -perm +0111 -exec strip --strip-all '{}'
+
+
+c_ok "Finished."

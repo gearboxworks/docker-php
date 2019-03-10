@@ -1,29 +1,18 @@
 #!/bin/sh
 
+# See gearboxworks/gearbox-base for details.
+test -f /build/include-me.sh && . /build/include-me.sh
+
+c_ok "Started."
+
 # ssh-keygen -A
 BUILDDIR="/build"
 
 
-checkExit()
-{
-	if [ "$?" != "0" ]
-	then
-		echo "# Gearbox: Exit reason \"$@\""
-		exit $?
-	fi
-}
-
-
 if [ ! -d ${BUILDDIR} ]
 then
-	echo "# Gearbox: ${BUILDDIR} doesn't exist."
-	exit
-fi
-
-
-if [ -d "/build/rootfs/" ]
-then
-	rsync -HvaxP /build/rootfs/ /
+	c_err "${BUILDDIR} doesn't exist."
+	exit 1
 fi
 
 
@@ -49,13 +38,13 @@ LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"; export LDFLAGS
 EXTENSION_DIR=${PHPINSTALL}/lib/php/modules; export EXTENSION_DIR
 
 
-echo "# Gearbox: Adding packages."
+c_ok "Adding packages."
 apk update; checkExit
 apk add --no-cache --virtual gearbox.persist $PERSIST_DEPS; checkExit
 apk add --no-cache --virtual gearbox.build $BUILD_DEPS; checkExit
 
 
-echo "# Gearbox: Fetching tarballs."
+c_ok "Fetching tarballs."
 cd /build; checkExit
 wget -nv -O "php-${GEARBOX_CONTAINER_VERSION}.tar.gz" -nv "$GEARBOX_CONTAINER_URL"; checkExit
 tar zxf php-${GEARBOX_CONTAINER_VERSION}.tar.gz; checkExit
@@ -65,13 +54,13 @@ wget -nv ftp://ftp.gnu.org/gnu/bison/bison-2.3.tar.gz; checkExit
 tar zxf bison-2.3.tar.gz; checkExit
 
 
-echo "# Gearbox: Configure Bison ${BISON_VERSION}."
+c_ok "Configure Bison ${BISON_VERSION}."
 cd ${BISONDIR}; checkExit
 ./configure --prefix=${PHPINSTALL}; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Configure MySQL ${MYSQL_VERSION}."
+c_ok "Configure MySQL ${MYSQL_VERSION}."
 cd ${BUILDDIR}; checkExit
 patch -p0 < mysql-5.1.72.patch
 cd ${MYSQLDIR}; checkExit
@@ -79,7 +68,7 @@ cd ${MYSQLDIR}; checkExit
 ln include/config.h include/my_config.h; checkExit
 
 
-echo "# Gearbox: Build MySQL ${MYSQL_VERSION}."
+c_ok "Build MySQL ${MYSQL_VERSION}."
 cd ${MYSQLDIR}/libmysql; checkExit
 perl -p -i -e 's#pkglibdir = \$\(libdir\)/mysql#pkglibdir = \$(libdir)#g; s#pkgincludedir = \$\(includedir\)/mysql#pkgincludedir = \$(includedir)#g;' Makefile; checkExit
 make install; checkExit
@@ -91,7 +80,7 @@ cd ${MYSQLDIR}/scripts; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Patching PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Patching PHP ${GEARBOX_CONTAINER_VERSION}."
 cd ${BUILDDIR}; checkExit
 patch -p0 < php-5.2.4-gmp.patch; checkExit
 patch -p0 < php-5.2.4-libxml29_compat.patch; checkExit
@@ -106,7 +95,7 @@ ln /usr/include/tidybuffio.h /usr/include/buffio.h
 cp ${BUILDDIR}/config.cache ${PHPBUILD}; checkExit
 
 
-echo "# Gearbox: Configure PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Configure PHP ${GEARBOX_CONTAINER_VERSION}."
 cd ${PHPBUILD}; checkExit
 ./configure \
 	--enable-fpm --with-fpm-user=${GEARBOX_USER} --with-fpm-group=${GEARBOX_GROUP} \
@@ -236,10 +225,10 @@ cd ${PHPBUILD}; checkExit
 #	--with-sqlite3=shared,/usr
 #	--enable-opcache
 
-echo "# Gearbox: Compile PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Compile PHP ${GEARBOX_CONTAINER_VERSION}."
 make; checkExit
 
-echo "# Gearbox: Install PHP ${GEARBOX_CONTAINER_VERSION}."
+c_ok "Install PHP ${GEARBOX_CONTAINER_VERSION}."
 make install; checkExit
 install -d -m755 ${PHPINSTALL}/etc/php/conf.d/; checkExit
 # rmdir ${PHPINSTALL}/include/php; checkExit
@@ -247,7 +236,7 @@ mkdir -p /var/run/php; checkExit
 ln ${PHPINSTALL}/bin/php-cgi ${PHPINSTALL}/sbin/php-fpm
 
 
-echo "# Gearbox: Adding Imagick extension, (3.4.3)."
+c_ok "Adding Imagick extension, (3.4.3)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/imagick-3.4.3.tgz; checkExit
 tar zxf imagick-3.4.3.tgz; checkExit
@@ -259,7 +248,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding Xdebug extension, (2.2.7)."
+c_ok "Adding Xdebug extension, (2.2.7)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv https://xdebug.org/files/xdebug-2.2.7.tgz; checkExit
 tar zxf xdebug-2.2.7.tgz; checkExit
@@ -270,7 +259,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding ssh2 extension, (0.13)."
+c_ok "Adding ssh2 extension, (0.13)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/ssh2-0.13.tgz; checkExit
 tar zxf ssh2-0.13.tgz; checkExit
@@ -281,7 +270,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding fileinfo extension, (1.0.4)."
+c_ok "Adding fileinfo extension, (1.0.4)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/Fileinfo-1.0.4.tgz; checkExit
 tar zxf Fileinfo-1.0.4.tgz; checkExit
@@ -292,7 +281,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding intl extension, (3.0.0)."
+c_ok "Adding intl extension, (3.0.0)."
 cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/intl-3.0.0.tgz; checkExit
 tar zxf intl-3.0.0.tgz; checkExit
@@ -304,7 +293,7 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding mbstring extension."
+c_ok "Adding mbstring extension."
 cd ${PHPBUILD}/ext/mbstring; checkExit
 phpize; checkExit
 ./configure; checkExit
@@ -315,7 +304,7 @@ make install; checkExit
 # Produces this error:
 # /build/php-5.2.4/ext/libsodium-2.0.11/libsodium.c:3995:5: error: too few arguments to function 'add_next_index_stringl'
 #     add_next_index_stringl(return_value, (const char *) header, sizeof header);
-#echo "# Gearbox: Adding libsodium extension, (2.0.11)."
+#c_ok "Adding libsodium extension, (2.0.11)."
 #cd ${PHPBUILD}/ext; checkExit
 #wget -nv http://pecl.php.net/get/libsodium-2.0.11.tgz; checkExit
 #tar zxf libsodium-2.0.11.tgz; checkExit
@@ -328,7 +317,7 @@ make install; checkExit
 
 # Produces this error:
 # Failed loading ${PHPINSTALL}/lib/php/modules/opcache.so:  Error relocating ${PHPINSTALL}/lib/php/modules/opcache.so: expand_filepath_ex: symbol not found
-#echo "# Gearbox: Adding opcache extension, (7.0.4)."
+#c_ok "Adding opcache extension, (7.0.4)."
 #cd ${PHPBUILD}/ext; checkExit
 #wget -nv https://pecl.php.net/get/zendopcache-7.0.4.tgz; checkExit
 #tar zxf zendopcache-7.0.4.tgz; checkExit
@@ -339,7 +328,7 @@ make install; checkExit
 #make install; checkExit
 
 
-echo "# Gearbox: pecl update-channels."
+c_ok "pecl update-channels."
 # Fixup pecl errors.
 # EG: "Warning: Invalid argument supplied for foreach() in ${PHPINSTALL}/share/pear/PEAR/Command.php
 #     "Warning: Invalid argument supplied for foreach() in Command.php on line 249"
@@ -347,18 +336,12 @@ sed -i 's/^exec $PHP -C -n -q/exec $PHP -C -q/' ${PHPINSTALL}/bin/pecl; checkExi
 pecl update-channels; checkExit
 
 
-echo "# Gearbox: Download mhsendmail."
-if [ ! -d /usr/local/bin ]
-then
-	mkdir -p /usr/local/bin
-fi
-wget -nv -O /usr/local/bin/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64; checkExit
-chmod a+x /usr/local/bin/mhsendmail; checkExit
-
-
+c_ok "Creating PHP tarball."
 if [ ! -d "${BUILDDIR}/output" ]
 then
-	mkdir -p "${BUILDDIR}/output"
+	mkdir -p "${BUILDDIR}/output"; checkExit
 fi
-tar zcvf "${BUILDDIR}/output/php.tar.gz" /usr/local
+tar zcvf "${BUILDDIR}/output/php.tar.gz" /usr/local; checkExit
 
+
+c_ok "Finished."

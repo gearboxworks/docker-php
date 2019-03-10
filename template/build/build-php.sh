@@ -1,60 +1,51 @@
 #!/bin/sh
 
+# See gearboxworks/gearbox-base for details.
+test -f /build/include-me.sh && . /build/include-me.sh
+
+c_ok "Started."
+
 # ssh-keygen -A
 BUILDDIR="/build"
 
 
-checkExit()
-{
-	if [ "$?" != "0" ]
-	then
-		echo "# Gearbox: Exit reason \"$@\""
-		exit $?
-	fi
-}
-
-
 if [ ! -d ${BUILDDIR} ]
 then
-	echo "# Gearbox: ${BUILDDIR} doesn't exist."
-	exit
+	c_err "${BUILDDIR} doesn't exist."
+	exit 1
 fi
 
 
 BUILD_BINS="autoconf binutils bison build-base coreutils fakeroot file g++ gcc gnupg gpgme libarchive-tools make musl pacman pkgconf re2c rsync"
-BUILD_LIBS="apache2-dev aspell-dev bzip2-dev curl-dev db-dev dpkg-dev enchant-dev freetds-dev freetype-dev gdbm-dev gettext-dev gmp-dev icu-dev imagemagick-dev imap-dev jpeg-dev krb5-dev libarchive libcurl libintl libressl2.6-libcrypto libc-dev libedit-dev libical-dev libjpeg-turbo-dev libmcrypt-dev libpng-dev libressl-dev libsodium-dev libssh2-dev libwebp-dev libxml2-dev libxpm-dev libxslt-dev libzip-dev musl-dev net-snmp-dev openldap-dev pcre-dev postgresql-dev readline-dev recode-dev sqlite-dev tidyhtml-dev unixodbc-dev zlib-dev"
+BUILD_LIBS="pcre-dev apache2-dev aspell-dev bzip2-dev curl-dev db-dev dpkg-dev enchant-dev freetds-dev freetype-dev gdbm-dev gettext-dev gmp-dev icu-dev imagemagick-dev imap-dev jpeg-dev krb5-dev libarchive libcurl libintl libressl2.7-libcrypto libc-dev libedit-dev libical-dev libjpeg-turbo-dev libmcrypt-dev libpng-dev libressl-dev libsodium-dev libssh2-dev libwebp-dev libxml2-dev libxpm-dev libxslt-dev libzip-dev musl-dev net-snmp-dev openldap-dev pcre-dev postgresql-dev readline-dev recode-dev sqlite-dev tidyhtml-dev unixodbc-dev zlib-dev"
 BUILD_DEPS="${BUILD_BINS} ${BUILD_LIBS}"
 
 PERSIST_DEPS="bash sudo wget curl gnupg openssl shadow pcre ca-certificates tar xz imagemagick"
 
-PHPDIR="${BUILDDIR}/php-${PACKAGE_VERSION}"
+PHPBUILD="${BUILDDIR}/php-${GEARBOX_CONTAINER_VERSION}"
+PHPINSTALL="/usr/local"
 
+# If you want to silence warnings use '-w', but don't... Really don't...
+# CFLAGS="-fstack-protector-strong -fpic -fpie -O2 -w"; export CFLAGS
 CFLAGS="-fstack-protector-strong -fpic -fpie -O2"; export CFLAGS
 CPPFLAGS="$CFLAGS"; export CPPFLAGS
 LDFLAGS="-Wl,-O1 -Wl,--hash-style=both -pie"; export LDFLAGS
-EXTENSION_DIR=/usr/lib/php/modules; export EXTENSION_DIR
+EXTENSION_DIR=${PHPINSTALL}/lib/php/modules; export EXTENSION_DIR
 
 
-echo "# Gearbox: Adding packages."
+c_ok "Adding packages."
 apk update; checkExit
 apk add --no-cache --virtual gearbox.persist $PERSIST_DEPS; checkExit
 apk add --no-cache --virtual gearbox.build $BUILD_DEPS; checkExit
 
 
-echo "# Gearbox: Creating user accounts."
-echo "%${GEARBOX_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-mkdir /var/mail; checkExit
-groupadd -g ${GEARBOX_UID} ${GEARBOX_USER}; checkExit
-useradd -d /home/${GEARBOX_USER} -c "Gearbox ${GEARBOX_USER} user" -u ${GEARBOX_UID} -g ${GEARBOX_GID} -N -s /bin/bash ${GEARBOX_USER}; checkExit
-
-
-echo "# Gearbox: Fetching tarballs."
+c_ok "Fetching tarballs."
 cd /build; checkExit
-wget -nv -O "php-${PACKAGE_VERSION}.tar.gz" -nv "$PACKAGE_URL"; checkExit
-tar zxf php-${PACKAGE_VERSION}.tar.gz; checkExit
+wget -nv -O "php-${GEARBOX_CONTAINER_VERSION}.tar.gz" -nv "$GEARBOX_CONTAINER_URL"; checkExit
+tar zxf php-${GEARBOX_CONTAINER_VERSION}.tar.gz; checkExit
 
 
-echo "# Gearbox: Patching PHP ${PACKAGE_VERSION}."
+c_ok "Patching PHP ${GEARBOX_CONTAINER_VERSION}."
 cd ${BUILDDIR}; checkExit
 patch -p0 < install-pear.patch; checkExit
 # patch -p0 < libressl-2.7.patch; checkExit
@@ -62,12 +53,12 @@ patch -p0 < allow-build-recode-and-imap-together.patch; checkExit
 ln /usr/include/tidybuffio.h /usr/include/buffio.h
 
 
-echo "# Gearbox: Configure PHP ${PACKAGE_VERSION}."
-cd ${PHPDIR}; checkExit
+c_ok "Configure PHP ${GEARBOX_CONTAINER_VERSION}."
+cd ${PHPBUILD}; checkExit
 autoconf; checkExit
 ./configure --config-cache --cache-file=config.cache \
 	--enable-fpm --with-fpm-user=${GEARBOX_USER} --with-fpm-group=${GEARBOX_GROUP} \
-	--datadir=/usr/share/php \
+	--datadir=${PHPINSTALL}/share/php \
 	--disable-gd-jis-conv \
 	--disable-short-tags \
 	--enable-bcmath=shared \
@@ -102,13 +93,13 @@ autoconf; checkExit
 	--enable-xmlreader=shared \
 	--enable-xmlwriter=shared \
 	--enable-zip=shared \
-	--libdir=/usr/lib/php \
+	--libdir=${PHPINSTALL}/lib/php \
 	--localstatedir=/var \
-	--prefix=/usr \
-	--sysconfdir=/etc/php \
+	--prefix=${PHPINSTALL} \
+	--sysconfdir=${PHPINSTALL}/etc/php \
 	--with-bz2=shared \
-	--with-config-file-path=/etc/php \
-	--with-config-file-scan-dir=/etc/php/conf.d \
+	--with-config-file-path=${PHPINSTALL}/etc/php \
+	--with-config-file-scan-dir=${PHPINSTALL}/etc/php/conf.d \
 	--with-curl=shared \
 	--with-db4 \
 	--with-dbmaker=shared \
@@ -139,7 +130,7 @@ autoconf; checkExit
 	--with-pdo-odbc=shared,unixODBC,/usr \
 	--with-pdo-pgsql=shared \
 	--with-pdo-sqlite=shared,/usr \
-	--with-pear=/usr/share/php \
+	--with-pear=${PHPINSTALL}/share/php \
 	--with-pgsql=shared \
 	--with-pic \
 	--with-png-dir=/usr \
@@ -161,18 +152,18 @@ autoconf; checkExit
 
 #	--enable-gd-native-ttf
 
-echo "# Gearbox: Compile PHP ${PACKAGE_VERSION}."
+c_ok "Compile PHP ${GEARBOX_CONTAINER_VERSION}."
 make; checkExit
 
-echo "# Gearbox: Install PHP ${PACKAGE_VERSION}."
+c_ok "Install PHP ${GEARBOX_CONTAINER_VERSION}."
 make install; checkExit
-install -d -m755 /etc/php/conf.d/; checkExit
-rmdir /usr/include/php/include; checkExit
+install -d -m755 ${PHPINSTALL}/etc/php/conf.d/; checkExit
+# rmdir ${PHPINSTALL}/include/php; checkExit
 mkdir -p /var/run/php; checkExit
 
 
-echo "# Gearbox: Adding Imagick extension, (3.4.3)."
-cd ${PHPDIR}/ext; checkExit
+c_ok "Adding Imagick extension, (3.4.3)."
+cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/imagick-3.4.3.tgz; checkExit
 tar zxf imagick-3.4.3.tgz; checkExit
 cd imagick-3.4.3; checkExit
@@ -182,8 +173,8 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding Xdebug extension, (2.6.0)."
-cd ${PHPDIR}/ext; checkExit
+c_ok "Adding Xdebug extension, (2.6.0)."
+cd ${PHPBUILD}/ext; checkExit
 wget -nv https://xdebug.org/files/xdebug-2.6.0.tgz; checkExit
 tar zxf xdebug-2.6.0.tgz; checkExit
 cd xdebug-2.6.0; checkExit
@@ -193,8 +184,8 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding mcrypt extension, (1.0.1)."
-cd ${PHPDIR}/ext; checkExit
+c_ok "Adding mcrypt extension, (1.0.1)."
+cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/mcrypt-1.0.1.tgz; checkExit
 tar zxf mcrypt-1.0.1.tgz; checkExit
 cd mcrypt-1.0.1; checkExit
@@ -204,8 +195,8 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: Adding ssh2 extension, (1.1.2)."
-cd ${PHPDIR}/ext; checkExit
+c_ok "Adding ssh2 extension, (1.1.2)."
+cd ${PHPBUILD}/ext; checkExit
 wget -nv http://pecl.php.net/get/ssh2-1.1.2.tgz; checkExit
 tar zxf ssh2-1.1.2.tgz; checkExit
 cd ssh2-1.1.2; checkExit
@@ -215,9 +206,20 @@ make; checkExit
 make install; checkExit
 
 
-echo "# Gearbox: pecl update-channels."
+c_ok "pecl update-channels."
 # Fixup pecl errors.
-# EG: "Warning: Invalid argument supplied for foreach() in /usr/share/pear/PEAR/Command.php
+# EG: "Warning: Invalid argument supplied for foreach() in ${PHPINSTALL}/share/pear/PEAR/Command.php
 #     "Warning: Invalid argument supplied for foreach() in Command.php on line 249"
-sed -i 's/^exec $PHP -C -n -q/exec $PHP -C -q/' /usr/bin/pecl; checkExit
+sed -i 's/^exec $PHP -C -n -q/exec $PHP -C -q/' ${PHPINSTALL}/bin/pecl; checkExit
 pecl update-channels; checkExit
+
+
+c_ok "Creating PHP tarball."
+if [ ! -d "${BUILDDIR}/output" ]
+then
+	mkdir -p "${BUILDDIR}/output"; checkExit
+fi
+tar zcvf "${BUILDDIR}/output/php.tar.gz" /usr/local; checkExit
+
+
+c_ok "Finished."

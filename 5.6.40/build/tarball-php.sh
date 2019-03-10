@@ -1,53 +1,46 @@
 #!/bin/sh
 
+# See gearboxworks/gearbox-base for details.
+test -f /build/build-base.sh && /bin/sh /build/build-base.sh
+test -f /build/include-me.sh && . /build/include-me.sh
+
+c_ok "Started."
+
 BUILDDIR="/build"
-
-
-checkExit()
-{
-	if [ "$?" != "0" ]
-	then
-		echo "# Gearbox: Exit reason \"$@\""
-		exit $?
-	fi
-}
 
 
 if [ "$BUILD_TYPE" != "" ]
 then
-	echo "# Gearbox: Maintaining build packages for build type \"$BUILD_TYPE\"."
-	exit
+	c_ok "Maintaining build packages for build type \"$BUILD_TYPE\"."
+	exit 0
 fi
 
 
-echo "# Gearbox: Extracting tarball."
+c_ok "Extracting tarball."
 TARBALL="${BUILDDIR}/output/php.tar.gz"
 if [ ! -f "${TARBALL}" ]
 then
-	echo "Gearbox: Tarball ${TARBALL} does NOT exist."
+	c_err "Tarball ${TARBALL} does NOT exist."
 	exit 1
 fi
-
-
 cd /
 tar xf ${TARBALL}; checkExit
 
 
-if [ -d "${BUILDDIR}/rootfs/" ]
-then
-	rsync -HvaxP ${BUILDDIR}/rootfs/ /
-fi
-
-echo "# Gearbox: Setting permissions."
+c_ok "Setting permissions."
 find /usr/local/bin /usr/local/sbin -type f | xargs chmod a+x
 # find . -type f -perm +0111 -exec strip --strip-all '{}'
 
-echo "# Gearbox: Adding packages required by PHP ${GEARBOX_CONTAINER_VERSION}."
+
+c_ok "Adding packages required by PHP ${GEARBOX_CONTAINER_VERSION}."
 RUNTIME_DEPS="$(scanelf --needed --nobanner --format '%n#p' --recursive /usr | tr ',' '\n' | sort -u | awk '/libmysqlclient.so.16/{next} system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }')"
-echo "# Gearbox: Adding $(echo "${RUNTIME_DEPS}" | wc -l) dependent packages."
+c_ok "Adding $(echo "${RUNTIME_DEPS}" | wc -l) dependent packages."
 apk add --no-cache --virtual gearbox.runtime ${RUNTIME_DEPS}; checkExit
 
-echo "# Gearbox: Cleaning up."
+
+c_ok "Cleaning up."
 rm -rf ${BUILDDIR} /var/cache/apk/APKINDEX* ; checkExit
 unset BUILD_DEPS PERSIST_DEPS RUNTIME_DEPS CPPFLAGS LDFLAGS CFLAGS EXTENSION_DIR
 
+
+c_ok "Finished."
