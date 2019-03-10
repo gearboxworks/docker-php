@@ -138,6 +138,8 @@ endif
 
 ################################################################################
 build: DockerfileTarball
+	@echo "Gearbox: Not supported yet."
+	exit 1
 ifeq ($(ORGANIZATION),)
 	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
 else

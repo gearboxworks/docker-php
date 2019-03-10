@@ -2,8 +2,8 @@
 # Standard top level Makefile used to build a Docker container for Gearbox - https://github.com/gearboxworks/gearbox/
 # 
 
-# VERSIONS = $(sort $(dir $(wildcard */)))
-VERSIONS = 5.2.17 5.3.29 5.4.45 5.5.38 5.6.36 7.0.30 7.1.18 7.2.6
+VERSIONS = $(sort $(dir $(wildcard */)))
+# VERSIONS = 5.2.17 5.3.29 5.4.45 5.5.38 5.6.36 7.0.30 7.1.18 7.2.6
 
 BASEDIR = $(shell pwd)
 
@@ -17,7 +17,7 @@ help:
 
 build:
 	@echo "Building for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), cd $(BASEDIR)/$(ver); make $@;)
+	$(foreach ver,$(VERSIONS), cd $(BASEDIR)/$(ver); make $@-base; make $@;)
 
 push:
 	@echo "Pushing to GitHub for versions: $(VERSIONS)"
@@ -28,7 +28,7 @@ release:
 
 clean:
 	@echo "Cleaning up for versions: $(VERSIONS)"
-	$(foreach ver,$(VERSIONS), cd $(BASEDIR)/$(ver); make $@;)
+	$(foreach ver,$(VERSIONS), cd $(BASEDIR)/$(ver); make $@; make $@-base;)
 
 list:
 	@echo "Listing for versions: $(VERSIONS)"
