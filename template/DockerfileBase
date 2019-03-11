@@ -1,9 +1,8 @@
-ARG VERSION="%%VERSION%%"
-
 # Here's the go. We are going to generate a PHP base package first which contains a full PHP install.
 # This is then used by DockerfileRuntime OR DockerfileTarball to generate the real runtime PHP container.
 # We do this to avoid having to rebuild PHP completely if we have only minor changes to be made to the PHP container.
 # Saves time!
+ARG VERSION="%%VERSION%%"
 
 
 # 1. First reference the gearbox-base image.
@@ -12,10 +11,11 @@ FROM gearboxworks/gearbox-base:alpine-3.9
 
 # 2. Now copy the local files specific to this image.
 COPY build /build
-COPY container.json /build/container.json
+COPY gearbox.json /build/gearbox.json
 
 
 # 3. Set up env variables.
+ARG VERSION="%%VERSION%%"
 MAINTAINER Gearbox Team <team@gearbox.works>
 ENV GEARBOX_CONTAINER_NAME "docker-php"
 ENV GEARBOX_CONTAINER_VERSION $VERSION
@@ -29,8 +29,8 @@ ENV GEARBOX_CONTAINER_ROOT "/"
 RUN /bin/sh /build/build-base.sh
 
 
-# 5. Run the build-php.sh script to set everything up.
-RUN /bin/sh /build/build-php.sh
+# 5. Run the build-base-php.sh script to set everything up.
+RUN /bin/sh /build/build-base-php.sh
 
 
 # 6. Expose ports.

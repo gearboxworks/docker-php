@@ -3,7 +3,6 @@
 # 
 
 VERSIONS = $(sort $(dir $(wildcard */)))
-# VERSIONS = 5.2.17 5.3.29 5.4.45 5.5.38 5.6.36 7.0.30 7.1.18 7.2.6
 
 BASEDIR = $(shell pwd)
 

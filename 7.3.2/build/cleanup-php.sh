@@ -31,7 +31,7 @@ apk add --no-cache --virtual gearbox.runtime ${RUNTIME_DEPS}; checkExit
 
 
 c_ok "Cleaning up."
-rm -rf ${BUILDDIR}; checkExit
+rm -rf ${BUILDDIR}/compile; checkExit
 unset BUILD_DEPS PERSIST_DEPS RUNTIME_DEPS CPPFLAGS LDFLAGS CFLAGS EXTENSION_DIR
 # find . -type f -perm +0111 -exec strip --strip-all '{}'
 
