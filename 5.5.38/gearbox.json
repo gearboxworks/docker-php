@@ -10,7 +10,7 @@
 	"ports": "-p 9000:9000",
 	"volumes": "-v /srv/sites:/srv/sites",
 	"restart": "--restart no",
-	"args": "--add-host 'mailhog:172.42.0.1'",
+	"args": "--add-host mailhog:172.42.0.1",
 	"env": "PHP_VERSION"
 }
 

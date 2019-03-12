@@ -43,5 +43,5 @@ EXPOSE 9000 9970
 # USER gearbox
 WORKDIR /project/www
 # ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
-CMD ["/usr/sbin/php-fpm", "-F"]
+CMD ["/usr/local/sbin/php-fpm", "-F"]
 
