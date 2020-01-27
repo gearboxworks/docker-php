@@ -31,6 +31,18 @@ $(shell )
 endif
 endif
 
+define osSystem
+$(shell uname)
+endef
+
+ifeq ($(osSystem),Linux)
+LOG_ARGS	:= -t 10
+else
+LOG_ARGS	:= -r -t 10
+endif
+
+
+################################################################################
 # Set global variables from container file.
 ORGANIZATION	:= $(call GetFromPkg,organization)
 NAME		:= $(call GetFromPkg,name)
@@ -79,7 +91,7 @@ CONTAINER_JSON	?= '$(call rawJSON)'
 LOGFILE := $(NAME).log
 
 
-.PHONY: build push release clean list inspect test create shell run start stop rm
+.PHONY: build push release clean list log inspect test create shell run start stop rm
 
 ################################################################################
 # Image related commands.
