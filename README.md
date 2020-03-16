@@ -1,3 +1,5 @@
+![release](https://github.com/gearboxworks/docker-php/workflows/release/badge.svg?event=release)
+
 ![PHP 7.2.x](https://img.shields.io/badge/PHP-7.2.x-green.svg)
 ![PHP 7.1.x](https://img.shields.io/badge/PHP-7.1.x-green.svg)
 ![PHP 7.0.x](https://img.shields.io/badge/PHP-7.0.x-green.svg)

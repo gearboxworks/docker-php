@@ -34,7 +34,7 @@ RUN /bin/sh /build/build-base-php.sh
 
 
 # 6. Expose ports.
-EXPOSE 9000 9970
+EXPOSE 22 9000 9970
 
 
 # 7. Set default command to exec.
