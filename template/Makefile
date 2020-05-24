@@ -2,45 +2,22 @@
 # Standard version level Makefile used to build a Docker container for Gearbox - https://github.com/gearboxworks/gearbox/
 #
 
+.ONESHELL:
 
-# Determine whether we use "nodeJS" or "JQ".
-JSONCMD := $(shell jq -r '.organization' ./gearbox.json)
-ifneq ($(JSONCMD),)
+ifdef TARGET_VERSION
+
+################################################################################
+JSONCMD := ./bin/JsonToConfig -json $(TARGET_VERSION)/gearbox.json
+JSONTEST := $(shell $(JSONCMD) -template-string '{{ .Json.name }}')
+ifeq ($(JSONTEST),)
+$(error "# Gearbox: ERROR - No ./bin/JsonToConfig binary.")
+
+else
 define GetFromPkg
-$(shell jq -r ".$(1)" ./gearbox.json)
+$(shell ./bin/JsonToConfig -json $(TARGET_VERSION)/gearbox.json -template-string '$(1)')
 endef
-
-define rawJSON
-$(shell jq -Mc -r '' ./gearbox.json)
-endef
-
-else
-JSONCMD := $(shell node -p "require('./gearbox.json').organization")
-ifneq ($(JSONCMD),)
-define GetFromPkg
-$(shell node -p "require('./gearbox.json').$(1)")
-endef
-
-define rawJSON
-$(shell node -p "require('./gearbox.json')")
-endef
-
-else
-$(shell )
 
 endif
-endif
-
-define osSystem
-$(shell uname)
-endef
-
-ifeq ($(osSystem),Linux)
-LOG_ARGS	:= -t 10
-else
-LOG_ARGS	:= -r -t 10
-endif
-
 
 ################################################################################
 # Set global variables from container file.
@@ -57,421 +34,202 @@ RESTART		:= $(call GetFromPkg,restart)
 ARGS		:= $(call GetFromPkg,args)
 STATE		:= $(call GetFromPkg,state)
 ENV		:= $(call GetFromPkg,env)
-
+GIT_COMMENT	:= Release $(TARGET_VERSION) commit.
 
 # The critical bit. Determines what Dockerfile to build against.
-ifeq ($(BUILD_TYPE),base)
-DOCKERFILE	:= DockerfileBase
-BUILD_ARGS	:= --build-arg BUILD_TYPE="$(BUILD_TYPE)"
-NAME		:= $(NAME)-$(BUILD_TYPE)
-
-else ifeq ($(BUILD_TYPE),full)
-DOCKERFILE	:= DockerfileRuntime
-BUILD_ARGS	:= --squash
-NAME		:= $(NAME)
-
-else ifeq ($(BUILD_TYPE),final)
-DOCKERFILE	:= DockerfileFinal
+SKIP		:= no
+DOCKERFILE	:= $(TARGET_VERSION)/DockerfileRuntime
 BUILD_ARGS	:= 
 NAME		:= $(NAME)
-
-else
-DOCKERFILE	:= 
-BUILD_ARGS	:= 
-NAME		:= 
-endif
-
 
 IMAGE_NAME	?= $(ORGANIZATION)/$(NAME)
 CONTAINER_NAME	?= $(NAME)-$(VERSION)
 CONTAINER_JSON	?= '$(call rawJSON)'
 
+else
+BASEDIR := $(shell pwd)
+VERSIONS := $(subst /,, $(sort $(filter-out ./, $(dir $(wildcard *.*/) ) ) ) )
+#$(error TARGET_VERSION is not set)
+endif
 
-# LOGFILE := $(NAME)-$(shell date +'%Y%m%d-%H%M%S').log
-LOGFILE := $(NAME).log
 
-
-.PHONY: build push release clean list log inspect test create shell run start stop rm
+.PHONY: init build push release clean list logs inspect test shell run start stop rm
 
 ################################################################################
 # Image related commands.
+.DEFAULT:
+	@make -k help
+
 default: all
 
 all:
-	@echo "clean		- Clean base & final container image."
-	@echo "build		- Build base & final container image."
-	@echo "test		- Execute base & final container unit tests."
-	@echo "push		- Push base & final container image to DockerHub & GitHub."
+	@make -k help
+
+help:
+	@echo "################################################################################"
+	@echo "init				- Initialize repository from TEMPLATE."
+	@echo "update				- Update repository TEMPLATE."
+	@echo "git-release			- Generate a repository release."
 	@echo ""
-	@echo "clean-base	- Clean base container image, [DockerfileBase]."
-	@echo "build-base	- Build base container image, [DockerfileBase]."
-	@echo "test-base	- Execute base container unit tests, [DockerfileBase]."
-	@echo "push-base	- Push base container image to DockerHub & GitHub, [DockerfileBase]."
+	@echo "clean-[all | <VERSION>]		- Clean runtime container image."
+	@echo "build-[all | <VERSION>]		- Generate runtime container image."
+	@echo "test-[all | <VERSION>]		- Execute container unit tests."
+	@echo "push-[all | <VERSION>]		- Push runtime container image to DockerHub & GitHub."
 	@echo ""
-	@echo "clean-final	- Clean final container image, [DockerfileFinal]."
-	@echo "build-final	- Build final container image from base container image, [DockerfileFinal]."
-	@echo "test-final	- Execute final container unit tests, [DockerfileFinal]."
-	@echo "push-final	- Push final container image to DockerHub & GitHub, [DockerfileFinal]."
+	@echo "info-[all | <VERSION>]		- Generate info from runtime container image."
+	@echo "logs-[all | <VERSION>]		- Show logs from last build."
+	@echo "readme				- Show README.md."
 	@echo ""
-	@echo "build-full	- Generate runtime container image without base reference, [DockerfileRuntime]."
-	@echo ""
-	@echo "info-base	- Generate PHP info from base container image."
-	@echo "info		- Generate PHP info from final container image."
-	@echo ""
-	@echo "Process:"
-	@echo "	make clean-base"
-	@echo "	make build-base"
-	@echo "	make clean"
-	@echo "	make build"
+	@echo "release-[all | <VERSION>]	- Execute the following process:"
+	@echo "	clean"
+	@echo "	build"
+	@echo "	test"
+	@echo "	push"
 
 
 ################################################################################
-info: $(DOCKERFILE)
-	@make info-real BUILD_TYPE="base"
-	@make info-real BUILD_TYPE="final"
+#%-all:
+#	@./bin/$*.sh all
 
-clean: $(DOCKERFILE)
-	@make clean-real BUILD_TYPE="base"
-	@make clean-real BUILD_TYPE="final"
-	@make clean-real BUILD_TYPE="full"
 
-build: $(DOCKERFILE)
-	@make build-real BUILD_TYPE="base"
-	@make build-real BUILD_TYPE="final"
-
-push: $(DOCKERFILE)
-	@make push-real BUILD_TYPE="base"
-	@make push-real BUILD_TYPE="final"
-
-release: $(DOCKERFILE)
-	@make release-real BUILD_TYPE="base"
-	@make release-real BUILD_TYPE="final"
-
-list: $(DOCKERFILE)
-	@make list-real BUILD_TYPE="base"
-	@make list-real BUILD_TYPE="final"
-
-log: $(DOCKERFILE)
-	@make log-real BUILD_TYPE="base"
-	@make log-real BUILD_TYPE="final"
-
-inspect: $(DOCKERFILE)
-	@make inspect-real BUILD_TYPE="base"
-	@make inspect-real BUILD_TYPE="final"
-
-test: $(DOCKERFILE)
-	@make test-real BUILD_TYPE="base"
-	@make test-real BUILD_TYPE="final"
-
+################################################################################
 readme:
 	@cat README.md
 
 
 ################################################################################
-info-%: $(DOCKERFILE)
-	@make info-real BUILD_TYPE="$*"
+init: *.json
 
-clean-%: $(DOCKERFILE)
-	@make clean-real BUILD_TYPE="$*"
-
-build-%: $(DOCKERFILE)
-	@make build-real BUILD_TYPE="$*"
-
-push-%: $(DOCKERFILE)
-	@make push-real BUILD_TYPE="$*"
-
-release-%: $(DOCKERFILE)
-	@make release-real BUILD_TYPE="$*"
-
-list-%: $(DOCKERFILE)
-	@make list-real BUILD_TYPE="$*"
-
-log-%: $(DOCKERFILE)
-	@make log-real BUILD_TYPE="$*"
-
-inspect-%: $(DOCKERFILE)
-	@make inspect-real BUILD_TYPE="$*"
-
-test-%: $(DOCKERFILE)
-	@make test-real BUILD_TYPE="$*"
+.FORCE:
+%.json: .FORCE
+	@echo "Gearbox: Initialize repository."
+	@./bin/create-build.sh "all"
+	@./bin/create-version.sh "all"
 
 
 ################################################################################
-info-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -m > $(NAME)-modules.txt
-	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -i > $(NAME)-info.txt
+update:
+	@./bin/TemplateUpdate.sh
+	@make init
+
+git-release:
+	@./bin/TemplateRelease.sh
 
 
 ################################################################################
-build-real: $(DOCKERFILE)
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	script -r -t 10 logs/$(LOGFILE) docker build -t $(IMAGE_NAME):$(VERSION) --label gearbox.json='$(call rawJSON)' --label container.organization="$(ORGANIZATION)" --label container.name="$(NAME)" --label container.version="$(VERSION)" --label container.majorversion="$(MAJORVERSION)" --label container.latest="$(LATEST)" --label container.class="$(CLASS)" --label container.network="$(NETWORK)" --label container.ports="$(PORTS)" --label container.volumes="$(VOLUMES)" --label container.restart="$(RESTART)" --label container.args="$(ARGS)" --label container.env="$(ENV)" --build-arg $(ENV)="$(VERSION)" $(BUILD_ARGS) -f $(DOCKERFILE) .
-	@echo "Gearbox: Log file saved to \"logs/$(LOGFILE)\""
-ifneq ($(MAJORVERSION),)
-	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(MAJORVERSION)
-endif
-	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -m > $(NAME)-modules.txt
-	-docker run --rm -it $(IMAGE_NAME):$(VERSION) php -i > $(NAME)-info.txt
+info:
+	@./bin/$@.sh $(VERSION)
+info-%:
+	@./bin/info.sh "$*"
 
 
 ################################################################################
-push-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker push $(IMAGE_NAME):$(VERSION)
-ifneq ($(MAJORVERSION),)
-	docker push $(IMAGE_NAME):$(MAJORVERSION)
-endif
+clean:
+	@./bin/$@.sh $(VERSION)
+clean-%:
+	@./bin/clean.sh "$*"
 
 
 ################################################################################
-release-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	@make clean
-	@make build
-	@make push
+build:
+	@./bin/$@.sh $(VERSION)
+build-%:
+	@./bin/build.sh "$*"
 
 
 ################################################################################
-clean-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	-docker image rm -f $(IMAGE_NAME):$(VERSION)
-ifneq ($(MAJORVERSION),)
-	-docker image rm -f $(IMAGE_NAME):$(MAJORVERSION)
-endif
-	-rm -f php-base-info.txt php-base-modules.txt php-info.txt php-modules.txt build/output/$(NAME)-$(VERSION).tar logs/*.log
+push:
+	@./bin/$@.sh $(VERSION)
+push-%:
+	@./bin/push.sh "$*"
 
 
 ################################################################################
-list-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	-docker image ls $(IMAGE_NAME):$(VERSION)
-ifneq ($(MAJORVERSION),)
-	-docker image ls $(IMAGE_NAME):$(MAJORVERSION)
-endif
+github:
+	@./bin/github.sh all
 
 
 ################################################################################
-inspect-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker image inspect $(IMAGE_NAME):$(VERSION)
+dockerhub:
+	@./bin/$@.sh $(VERSION)
+dockerhub-%:
+	@./bin/dockerhub.sh "$*"
 
 
 ################################################################################
-log-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	@script -dp logs/$(LOGFILE) | less -SinR
+release:
+	@./bin/$@.sh $(VERSION)
+release-%:
+	@./bin/release.sh "$*"
 
 
 ################################################################################
-test-real:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	make -k stop; make -k rm
-	make -k clean; make -k build; make -k create; make -k start
+list:
+	@./bin/$@.sh $(VERSION)
+list-%:
+	@./bin/list.sh "$*"
 
 
 ################################################################################
-# Container related commands.
-
-create:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker create   --name $(CONTAINER_NAME) $(RESTART)  $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION)
+logs:
+	@./bin/$@.sh $(VERSION)
+logs-%:
+	@./bin/logs.sh "$*"
 
 
 ################################################################################
-shell:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker run --rm --name $(CONTAINER_NAME)-shell -i -t $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION) /bin/bash -l
+inspect:
+	@./bin/$@.sh $(VERSION)
+inspect-%:
+	@./bin/inspect.sh "$*"
 
 
 ################################################################################
-run:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker run --rm --name $(CONTAINER_NAME)             $(NETWORK) $(PORTS) $(ARGS) $(VOLUMES) $(IMAGE_NAME):$(VERSION)
-
-
-################################################################################
-start:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker start $(CONTAINER_NAME)
-
-
-################################################################################
-stop:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker stop $(CONTAINER_NAME)
+test:
+	@./bin/$@.sh $(VERSION)
+test-%:
+	@./bin/test.sh "$*"
 
 
 ################################################################################
 rm:
-ifeq ($(STATE),not_supported)
-	@echo "Gearbox: Not supported yet."
-	@exit 1
-endif
-ifeq ($(ORGANIZATION),)
-	@echo "Gearbox: ERROR - You need to install JQ or NodeJS."
-	@exit 1
-endif
-ifeq ($(DOCKERFILE),)
-	@echo "Gearbox: ERROR - Unknown build type."
-	@exit 1
-endif
-	docker container rm -f $(CONTAINER_NAME)
+	@./bin/$@.sh $(VERSION)
+rm-%:
+	@./bin/rm.sh "$*"
 
 
 ################################################################################
+start:
+	@./bin/$@.sh $(VERSION)
+start-%:
+	@./bin/start.sh "$*"
+
+
+################################################################################
+stop:
+	@./bin/$@.sh $(VERSION)
+stop-%:
+	@./bin/stop.sh "$*"
+
+
+################################################################################
+ports:
+	@./bin/$@.sh $(VERSION)
+ports-%:
+	@./bin/ports.sh "$*"
+
+
+################################################################################
+shell:
+	@./bin/$@.sh $(VERSION)
+shell-%:
+	@./bin/shell.sh "$*"
+
+
+################################################################################
+ssh:
+	@./bin/$@.sh $(VERSION)
+ssh-%:
+	@./bin/ssh.sh "$*"
+
 
