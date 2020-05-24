@@ -15,7 +15,7 @@
 	},
 	"build": {
 		"ports": {
-			"php-fpm": "9090"
+			"php-fpm": "9000"
 		},
 		"run": "",
 		"args": "/usr/local/sbin/php-fpm",
