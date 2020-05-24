@@ -9,6 +9,10 @@
 		"description": [
 			"PHP is a popular general-purpose scripting language that is especially suited to web development."
 		],
+		"info": "PHP",
+		"description": [
+			"PHP is a popular general-purpose scripting language that is especially suited to web development."
+		],
 		"maintainer": "Gearbox Team <team@gearbox.works>",
 		"class": "processvm",
 		"refurl": "https://www.php.net/"
@@ -45,6 +49,42 @@
 	"extensions": {
 	},
 	"versions": {
+		"5.3.29": {
+			"majorversion": "5.3",
+			"latest": false,
+			"ref": "php:5.3.29-cli",
+			"base": "gearboxworks/gearbox-base:alpine-3.8"
+		},
+		"5.4.45": {
+			"majorversion": "5.4",
+			"latest": false,
+			"ref": "php:5.4.45-fpm",
+			"base": "gearboxworks/gearbox-base:alpine-3.8"
+		},
+		"5.5.38": {
+			"majorversion": "5.5",
+			"latest": false,
+			"ref": "php:5.5.38-fpm-alpine",
+			"base": "gearboxworks/gearbox-base:alpine-3.8"
+		},
+		"5.6.40": {
+			"majorversion": "5.6",
+			"latest": false,
+			"ref": "php:5.6.40-fpm-alpine3.8",
+			"base": "gearboxworks/gearbox-base:alpine-3.8"
+		},
+		"7.0.29": {
+			"majorversion": "7.0",
+			"latest": false,
+			"ref": "php:7.0.29-zts-alpine3.4",
+			"base": "gearboxworks/gearbox-base:alpine-3.4"
+		},
+		"7.1.33": {
+			"majorversion": "7.1",
+			"latest": false,
+			"ref": "php:7.1.33-fpm-alpine3.10",
+			"base": "gearboxworks/gearbox-base:alpine-3.10"
+		},
 		"7.2.31": {
 			"majorversion": "7.2",
 			"latest": false,

@@ -2,15 +2,15 @@
 ################################################################################
 # WARNING: This file has been auto-generated. DO NOT EDIT: WARNING
 # Created on 2020-05-25T08:40:22+1000, using template:DockerfileRuntime.tmpl and json:gearbox.json
-# Referenced Docker container for docker-php based off gearboxworks/gearbox-base:alpine-3.11 with php:7.2.31-fpm-alpine3.11 overlayed.
+# Referenced Docker container for docker-php based off gearboxworks/gearbox-base:alpine-3.8 with php:5.6.40-fpm-alpine3.8 overlayed.
 
-ARG VERSION=7.2.31
+ARG VERSION=5.6.40
 
 # 1. First reference the gearbox-base image.
-FROM gearboxworks/gearbox-base:alpine-3.11 as gearbox-base
+FROM gearboxworks/gearbox-base:alpine-3.8 as gearbox-base
 
 # 2. Next reference the third party image.
-FROM php:7.2.31-fpm-alpine3.11
+FROM php:5.6.40-fpm-alpine3.8
 ARG VERSION
 ARG GEARBOX_ENTRYPOINT
 ARG GEARBOX_ENTRYPOINT_ARGS
@@ -26,8 +26,8 @@ ENV GEARBOX_CONTAINER_VERSION ${VERSION}
 ENV GEARBOX_ENTRYPOINT ${GEARBOX_ENTRYPOINT}
 ENV GEARBOX_ENTRYPOINT_ARGS ${GEARBOX_ENTRYPOINT_ARGS}
 LABEL gearbox.json='{"schema": "gear-2","meta": {"state": "production","organization": "gearboxworks","name": "php","label": "PHP","info": "PHP","description": ["PHP is a popular general-purpose scripting language that is especially suited to web development."],"info": "PHP","description": ["PHP is a popular general-purpose scripting language that is especially suited to web development."],"maintainer": "Gearbox Team <team@gearbox.works>","class": "processvm","refurl": "https://www.php.net/"},"build": {"ports": {"php-fpm": "9000"},"run": "","args": "/usr/local/sbin/php-fpm","env": {"PHP_USER": "gearbox"},"network": "--network gearboxnet","volumes": "","restart": "--restart no"},"run": {"commands": {"default": "/usr/local/bin/php","pear": "/usr/local/bin/pear","peardev": "/usr/local/bin/peardev","pecl": "/usr/local/bin/pecl","phar": "/usr/local/bin/phar","php": "/usr/local/bin/php","php-config": "/usr/local/bin/php-config","php-fpm": "/usr/local/sbin/php-fpm","phpdbg": "/usr/local/bin/phpdbg","phpize": "/usr/local/bin/phpize"}},"project": {},"extensions": {},"versions": {"5.3.29": {"majorversion": "5.3","latest": false,"ref": "php:5.3.29-cli","base": "gearboxworks/gearbox-base:alpine-3.8"},"5.4.45": {"majorversion": "5.4","latest": false,"ref": "php:5.4.45-fpm","base": "gearboxworks/gearbox-base:alpine-3.8"},"5.5.38": {"majorversion": "5.5","latest": false,"ref": "php:5.5.38-fpm-alpine","base": "gearboxworks/gearbox-base:alpine-3.8"},"5.6.40": {"majorversion": "5.6","latest": false,"ref": "php:5.6.40-fpm-alpine3.8","base": "gearboxworks/gearbox-base:alpine-3.8"},"7.0.29": {"majorversion": "7.0","latest": false,"ref": "php:7.0.29-zts-alpine3.4","base": "gearboxworks/gearbox-base:alpine-3.4"},"7.1.33": {"majorversion": "7.1","latest": false,"ref": "php:7.1.33-fpm-alpine3.10","base": "gearboxworks/gearbox-base:alpine-3.10"},"7.2.31": {"majorversion": "7.2","latest": false,"ref": "php:7.2.31-fpm-alpine3.11","base": "gearboxworks/gearbox-base:alpine-3.11"},"7.3.18": {"majorversion": "7.3","latest": false,"ref": "php:7.3.18-fpm-alpine3.11","base": "gearboxworks/gearbox-base:alpine-3.11"},"7.4.6": {"majorversion": "7.4","latest": true,"ref": "php:7.4.6-fpm-alpine3.11","base": "gearboxworks/gearbox-base:alpine-3.11"}}}'
-LABEL gearbox.version='7.2.31'
-ENV GEARBOX_VERSION "7.2.31"
+LABEL gearbox.version='5.6.40'
+ENV GEARBOX_VERSION "5.6.40"
 LABEL container.class="processvm"
 ENV GEARBOX_CLASS "processvm"
 LABEL container.description="[PHP is a popular general-purpose scripting language that is especially suited to web development.]"
@@ -59,14 +59,14 @@ LABEL container.run=""
 ENV GEARBOX_RUN ""
 LABEL container.volumes=""
 ENV GEARBOX_VOLUMES ""
-LABEL container.base="gearboxworks/gearbox-base:alpine-3.11"
-ENV GEARBOX_BASE "gearboxworks/gearbox-base:alpine-3.11"
+LABEL container.base="gearboxworks/gearbox-base:alpine-3.8"
+ENV GEARBOX_BASE "gearboxworks/gearbox-base:alpine-3.8"
 LABEL container.latest="false"
 ENV GEARBOX_LATEST "false"
-LABEL container.majorversion="7.2"
-ENV GEARBOX_MAJORVERSION "7.2"
-LABEL container.ref="php:7.2.31-fpm-alpine3.11"
-ENV GEARBOX_REF "php:7.2.31-fpm-alpine3.11"
+LABEL container.majorversion="5.6"
+ENV GEARBOX_MAJORVERSION "5.6"
+LABEL container.ref="php:5.6.40-fpm-alpine3.8"
+ENV GEARBOX_REF "php:5.6.40-fpm-alpine3.8"
 ENV PHP_USER "gearbox"
 
 # 5. Now copy the local files specific to this container.

@@ -22,6 +22,12 @@ GitHub release(latest): [![last-release-date](https://img.shields.io/github/rele
 ## Supported versions and respective Dockerfiles
 | Service Website | Gear Name | Latest GitHub Version | Latest Docker Version | Docker Size | Docker Tags |
 |:---------------:|:---------:|:---------------------:|:---------------------:|:-----------:|:-----------:|
+| [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-5.3.29-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/5.3.29)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/5.3.29)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`5.3.29`, `5.3`](https://github.com/gearboxworks/docker-php/blob/master/versions/5.3.29/DockerfileRuntime))_ |
+| [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-5.4.45-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/5.4.45)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/5.4.45)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`5.4.45`, `5.4`](https://github.com/gearboxworks/docker-php/blob/master/versions/5.4.45/DockerfileRuntime))_ |
+| [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-5.5.38-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/5.5.38)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/5.5.38)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`5.5.38`, `5.5`](https://github.com/gearboxworks/docker-php/blob/master/versions/5.5.38/DockerfileRuntime))_ |
+| [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-5.6.40-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/5.6.40)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/5.6.40)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`5.6.40`, `5.6`](https://github.com/gearboxworks/docker-php/blob/master/versions/5.6.40/DockerfileRuntime))_ |
+| [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-7.0.29-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/7.0.29)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/7.0.29)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`7.0.29`, `7.0`](https://github.com/gearboxworks/docker-php/blob/master/versions/7.0.29/DockerfileRuntime))_ |
+| [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-7.1.33-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/7.1.33)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/7.1.33)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`7.1.33`, `7.1`](https://github.com/gearboxworks/docker-php/blob/master/versions/7.1.33/DockerfileRuntime))_ |
 | [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-7.2.31-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/7.2.31)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/7.2.31)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`7.2.31`, `7.2`](https://github.com/gearboxworks/docker-php/blob/master/versions/7.2.31/DockerfileRuntime))_ |
 | [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-7.3.18-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/7.3.18)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/7.3.18)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`7.3.18`, `7.3`](https://github.com/gearboxworks/docker-php/blob/master/versions/7.3.18/DockerfileRuntime))_ |
 | [PHP](https://www.php.net/) | [gearbox.json](https://github.com/gearboxworks/docker-php/blob/master/gearbox.json) | [![php](https://img.shields.io/badge/php-7.4.6-green.svg)](https://github.com/gearboxworks/docker-php/releases/) | [![Docker Version](https://img.shields.io/docker/v/gearboxworks/php/7.4.6)](https://hub.docker.com/repository/docker/gearboxworks/php) | [![Docker Size](https://img.shields.io/docker/image-size/gearboxworks/php/7.4.6)](https://hub.docker.com/repository/docker/gearboxworks/php/tags) | _([`7.4.6`, `7.4`, `latest`](https://github.com/gearboxworks/docker-php/blob/master/versions/7.4.6/DockerfileRuntime))_ |
@@ -122,16 +128,16 @@ Gearbox: Pulling Gear php:latest - OK.
 Gearbox: Installed Gear 'php:latest' OK.
 Gearbox: Starting gear 'php:latest':
 Gearbox: Gear 'php:latest' started OK
-[php:7.4.6] ~ $ 
+[php:5.4.45] ~ $ 
 ```
 
-Create, and start version **7.4.6** of the **php** [Gearbox](https://github.com/gearboxworks/) container and run a shell with commands.
+Create, and start version **5.4.45** of the **php** [Gearbox](https://github.com/gearboxworks/) container and run a shell with commands.
 
-**./bin/launch shell php:7.4.6 ls -l**
+**./bin/launch shell php:5.4.45 ls -l**
 
 ```
-me@home:~ % ./bin/launch shell php:7.4.6 ls -l
-Gearbox: Gear 'php:7.4.6' already started.
+me@home:~ % ./bin/launch shell php:5.4.45 ls -l
+Gearbox: Gear 'php:5.4.45' already started.
 total 60
 -rw-r--r--    1 gearbox  gearbox       5864 May 24 02:25 Makefile
 -rw-r--r--    1 gearbox  gearbox      18757 May 24 02:25 README.md
@@ -145,11 +151,11 @@ drwxr-xr-x    1 gearbox  gearbox        136 May 22 01:40 versions
 me@home:~ % 
 ```
 
-**./bin/launch shell php:7.4.6 ps -eaf**
+**./bin/launch shell php:5.4.45 ps -eaf**
 
 ```
-me@home:~ % ./bin/launch shell php:7.4.6 ps -eaf
-Gearbox: Gear 'php:7.4.6' already started.
+me@home:~ % ./bin/launch shell php:5.4.45 ps -eaf
+Gearbox: Gear 'php:5.4.45' already started.
 PID   USER     TIME  COMMAND
     1 root      0:00 /bin/s6-svscan /etc/gearbox/services
    16 root      0:00 s6-supervise GearShift
@@ -173,14 +179,14 @@ Downloaded Gearbox images: 1 found
 +----------+----------------------------------+-------+--------+
 | CLASS    | IMAGE                            | PORTS | SIZE   |
 +----------+----------------------------------+-------+--------+
-| graphics | gearboxworks/php:7.4.6  |       |  40 MB |
+| graphics | gearboxworks/php:5.4.45  |       |  40 MB |
 +----------+----------------------------------+-------+--------+
 
 Installed Gearbox gears: 1 found
 +---------------------+----------+---------+----------------------------------+-------+----------+---------------+--------+--------+
 | NAME                | CLASS    | STATE   | IMAGE                            | PORTS | SSH PORT | IP ADDRESS    | MOUNTS | SIZE   |
 +---------------------+----------+---------+----------------------------------+-------+----------+---------------+--------+--------+
-| php-7.4.6  | graphics | created | gearboxworks/php:7.4.6  |       |          | (gearboxnet)  |        |  40 MB |
+| php-5.4.45  | graphics | created | gearboxworks/php:5.4.45  |       |          | (gearboxnet)  |        |  40 MB |
 |                     |          |         |                                  |       |          |               |        |        |
 +---------------------+----------+---------+----------------------------------+-------+----------+---------------+--------+--------+
 
@@ -206,11 +212,11 @@ This allows for seamless integration of a [Gearbox](https://github.com/gearboxwo
 
 `./php -flag1 -flag2 variable1 variable2 variable3`
 
-`./bin/launch run php:7.4.6 -flag1 -flag2 variable1 variable2 variable3`
+`./bin/launch run php:5.4.45 -flag1 -flag2 variable1 variable2 variable3`
 
-`./php-fpm -flag1 -flag2`
+`./phpdbg -flag1 -flag2`
 
-`./phpdbg`
+`./pear`
 
 `./phpize -flag1 variable1 variable2 variable3`
 
@@ -327,4 +333,4 @@ You can either build your container as above, or use it from DockerHub with thes
 
 
 * * *
-**Note: This README was generated by `JsonToConfig` - Created on 2020-05-24T22:29:19+1000, using template:README.md.tmpl and json:gearbox.json**
+**Note: This README was generated by `JsonToConfig` - Created on 2020-05-25T08:40:22+1000, using template:README.md.tmpl and json:gearbox.json**
