@@ -33,7 +33,6 @@
 			"peardev": "/usr/local/bin/peardev",
 			"pecl": "/usr/local/bin/pecl",
 			"phar": "/usr/local/bin/phar",
-			"phar.phar": "/usr/local/bin/phar.phar",
 			"php": "/usr/local/bin/php",
 			"php-config": "/usr/local/bin/php-config",
 			"php-fpm": "/usr/local/sbin/php-fpm",
