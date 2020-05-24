@@ -18,7 +18,7 @@
 			"php-fpm": "9090"
 		},
 		"run": "",
-		"args": "",
+		"args": "/usr/local/sbin/php-fpm",
 		"env": {
 			"PHP_USER": "gearbox"
 		},
@@ -28,9 +28,17 @@
 	},
 	"run": {
 		"commands": {
-			"default": "php",
-			"php-fpm": "/usr/local/bin/php-fpm",
-			"php": "/usr/local/bin/php"
+			"default": "/usr/local/bin/php",
+			"pear": "/usr/local/bin/pear",
+			"peardev": "/usr/local/bin/peardev",
+			"pecl": "/usr/local/bin/pecl",
+			"phar": "/usr/local/bin/phar",
+			"phar.phar": "/usr/local/bin/phar.phar",
+			"php": "/usr/local/bin/php",
+			"php-config": "/usr/local/bin/php-config",
+			"php-fpm": "/usr/local/sbin/php-fpm",
+			"phpdbg": "/usr/local/bin/phpdbg",
+			"phpize": "/usr/local/bin/phpize"
 		}
 	},
 	"project": {
@@ -47,13 +55,13 @@
 		"7.3.18": {
 			"majorversion": "7.3",
 			"latest": false,
-			"ref": "7.3.18-fpm-alpine3.11",
+			"ref": "php:7.3.18-fpm-alpine3.11",
 			"base": "gearboxworks/gearbox-base:alpine-3.11"
 		},
 		"7.4.6": {
 			"majorversion": "7.4",
 			"latest": true,
-			"ref": "7.4.6-fpm-alpine3.11",
+			"ref": "php:7.4.6-fpm-alpine3.11",
 			"base": "gearboxworks/gearbox-base:alpine-3.11"
 		}
 	}
